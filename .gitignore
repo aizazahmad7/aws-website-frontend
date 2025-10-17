@@ -1,0 +1,21 @@
+# OS
+.DS_Store
+
+# Node / builds
+node_modules/
+dist/
+
+# Terraform
+.terraform/
+infra/.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+infra/terraform.tfstate
+infra/terraform.tfstate.backup
+*.tfstate
+*.tfstate.*
+
+# Misc
+.env
+*.zip
+*.tar.gz
