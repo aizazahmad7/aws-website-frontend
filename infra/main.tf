@@ -131,3 +131,71 @@ resource "aws_s3_bucket_policy" "site" {
     ]
   })
 }
+# ---------------------------------------------------------------------------
+# GitHub Actions OIDC Deploy Role (for aizazahmad7/aws-website-frontend)
+# ---------------------------------------------------------------------------
+
+
+data "aws_iam_policy_document" "github_oidc_trust" {
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    principals {
+      type        = "Federated"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "token.actions.githubusercontent.com:sub"
+      values   = ["repo:aizazahmad7/aws-website-frontend:*"]
+    }
+  }
+}
+
+resource "aws_iam_role" "github_deploy" {
+  name               = "${var.app_name}-github-deploy"
+  assume_role_policy = data.aws_iam_policy_document.github_oidc_trust.json
+}
+
+data "aws_iam_policy_document" "github_deploy_policy" {
+  # Allow writing to S3 bucket
+  statement {
+    sid     = "S3Write"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      aws_s3_bucket.site.arn,
+      "${aws_s3_bucket.site.arn}/*"
+    ]
+  }
+
+  # Allow CloudFront cache invalidation
+  statement {
+    sid       = "CFInvalidate"
+    actions   = ["cloudfront:CreateInvalidation"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "github_deploy_policy" {
+  name   = "${var.app_name}-github-deploy"
+  policy = data.aws_iam_policy_document.github_deploy_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "github_deploy_attach" {
+  role       = aws_iam_role.github_deploy.name
+  policy_arn = aws_iam_policy.github_deploy_policy.arn
+}
+
+output "deploy_role_arn" {
+  description = "IAM role ARN for GitHub Actions OIDC deploys"
+  value       = aws_iam_role.github_deploy.arn
+}
