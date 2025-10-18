@@ -2,7 +2,7 @@ name: Deploy React Frontend
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
     paths:
       - "myapp/**"
       - ".github/workflows/deploy-frontend.yml"
