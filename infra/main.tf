@@ -145,19 +145,26 @@ data "aws_iam_policy_document" "github_oidc_trust" {
       identifiers = [aws_iam_openid_connect_provider.github.arn]
     }
 
+    # audience must be sts.amazonaws.com
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:aud"
       values   = ["sts.amazonaws.com"]
     }
 
+    # Allow only your repo on pushes to main, PRs, and (if used) environments
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:aizazahmad7/aws-website-frontend:*"]
+      values = [
+        "repo:aizazahmad7/aws-website-frontend:ref:refs/heads/main",
+        "repo:aizazahmad7/aws-website-frontend:pull_request",
+        "repo:aizazahmad7/aws-website-frontend:environment:*"
+      ]
     }
   }
 }
+
 
 resource "aws_iam_role" "github_deploy" {
   name               = "${var.app_name}-github-deploy"
