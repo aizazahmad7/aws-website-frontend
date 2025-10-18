@@ -139,15 +139,18 @@ resource "aws_s3_bucket_policy" "site" {
 data "aws_iam_policy_document" "github_oidc_trust" {
   statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
+
     principals {
       type        = "Federated"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"]
+      identifiers = [aws_iam_openid_connect_provider.github.arn]
     }
+
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:aud"
       values   = ["sts.amazonaws.com"]
     }
+
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
@@ -164,7 +167,7 @@ resource "aws_iam_role" "github_deploy" {
 data "aws_iam_policy_document" "github_deploy_policy" {
   # Allow writing to S3 bucket
   statement {
-    sid     = "S3Write"
+    sid = "S3Write"
     actions = [
       "s3:PutObject",
       "s3:PutObjectAcl",
@@ -198,4 +201,17 @@ resource "aws_iam_role_policy_attachment" "github_deploy_attach" {
 output "deploy_role_arn" {
   description = "IAM role ARN for GitHub Actions OIDC deploys"
   value       = aws_iam_role.github_deploy.arn
+}
+# --- GitHub OIDC provider (needed once per account) ---
+resource "aws_iam_openid_connect_provider" "github" {
+  url = "https://token.actions.githubusercontent.com"
+
+  client_id_list = [
+    "sts.amazonaws.com"
+  ]
+
+  # GitHub's current root CA thumbprint
+  thumbprint_list = [
+    "6938fd4d98bab03faadb97b34396831e3780aea1"
+  ]
 }
