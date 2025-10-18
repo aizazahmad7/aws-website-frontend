@@ -25,5 +25,11 @@ variable "github_repo" {
 
 variable "deploy_branch" {
   type    = string
-  default = "main"
+  default = "master"
+}
+
+variable "app_name" {
+  description = "DNS-safe name used for bucket, tags, etc."
+  type        = string
+  default     = "aws-website-frontend"
 }
