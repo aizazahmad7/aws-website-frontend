@@ -19,3 +19,9 @@ infra/terraform.tfstate.backup
 .env
 *.zip
 *.tar.gz
+# python
+.venv/
+__pycache__/
+*.pyc
+backend/app/package/
+infra/backend/build/
