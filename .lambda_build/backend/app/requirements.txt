@@ -1,0 +1,5 @@
+fastapi==0.115.2        # web framework
+mangum==0.17.0          # ASGI adapter for AWS Lambda
+boto3==1.34.158         # AWS SDK (Bedrock Runtime)
+pydantic==2.9.2         # request/response models & validation
+uvicorn==0.30.6         # local dev server
