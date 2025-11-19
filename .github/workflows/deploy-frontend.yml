@@ -55,9 +55,14 @@ jobs:
         working-directory: myapp
         run: npm ci
 
-      - name: Build
+      - name: Build (with API URL)
         working-directory: myapp
-        run: npm run build
+        env:
+          REACT_APP_API_BASE_URL: https://ntazwzmdfe.execute-api.us-east-1.amazonaws.com
+        run: |
+          echo "Building with API=${REACT_APP_API_BASE_URL}"
+          npm run build
+
 
       # Upload assets with long cache (immutable)
       - name: Upload assets (long cache)
