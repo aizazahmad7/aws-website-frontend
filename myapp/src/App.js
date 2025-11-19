@@ -25,7 +25,7 @@ export default function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Frontend ↔ Backend check</h1>
+        <h1>Frontend ↔ Backend check v2</h1>
         {error ? (
           <p style={{ color: "salmon" }}>Error: {error}</p>
         ) : status ? (
