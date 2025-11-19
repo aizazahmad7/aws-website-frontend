@@ -4,8 +4,8 @@ on:
   push:
     branches: [ master ]
     paths:
-      - "myapp/**"
-      - ".github/workflows/deploy-frontend.yml"
+      - "**"   # run for any file change
+
 
 permissions:
   id-token: write   # required for OIDC
