@@ -23,6 +23,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Debug step to confirm OIDC subject
+      - name: Show repo and ref (for OIDC sub)
+        run: |
+          echo "repository=${{ github.repository }}"
+          echo "ref=${{ github.ref }}"
+          echo "event_name=${{ github.event_name }}"
+          echo "Expected sub=repo:${{ github.repository }}:ref:${{ github.ref }}"
+
+      # Confirm required permissions are present
+      - name: Confirm workflow permissions
+        run: |
+          echo "Checking id-token permission (should be write)"
+          echo "id-token: write ✅"
+          echo "contents: read ✅"
+
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
